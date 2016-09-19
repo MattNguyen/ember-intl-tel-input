@@ -248,6 +248,15 @@ export default Ember.TextField.extend({
     set() { /* no-op */ }
   }),
 
+  didUpdateAttrs() {
+    this._super(...arguments);
+    let countryCode = this.get('countryCode');
+    if (!this.get('countryCode')) {
+      countryCode = this.get('selectedCountryData').iso2;
+    }
+    return this.$().intlTelInput('setCountry', countryCode);
+  },
+
   /**
    * Get more information about a validation error. Requires the utilities
    * scripts.
@@ -295,18 +304,25 @@ export default Ember.TextField.extend({
     // let Ember be aware of the changes
     this.$().change(notifyPropertyChange);
 
-    this.$().intlTelInput({
+    let intlTelInput = this.$().intlTelInput({
       allowExtensions: this.get('allowExtensions'),
       autoFormat: this.get('autoFormat'),
       autoHideDialCode: this.get('autoHideDialCode'),
       autoPlaceholder: this.get('autoPlaceholder'),
-      defaultCountry: this.get('defaultCountry'),
+      initialCountry: this.get('initialCountry'),
       geoIpLookup: this.get('geoIpLookup'),
       nationalMode: this.get('nationalMode'),
       numberType: this.get('numberType'),
       onlyCountries: this.get('onlyCountries'),
-      preferredCountries: this.get('preferredCountries'),
+      preferredCountries: this.get('preferredCountries')
     });
+
+    if (this.attrs.onselect) {
+      this.$().on('countrychange', (e, countryData) => {
+        this.sendAction('onselect', countryData);
+      });
+    }
+    this.set('intlTelInput', intlTelInput);
   },
 
   /**
