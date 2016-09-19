@@ -304,12 +304,16 @@ export default Ember.TextField.extend({
     // let Ember be aware of the changes
     this.$().change(notifyPropertyChange);
 
+    let countryCode = this.get('countryCode');
+    if (countryCode) {
+      countryCode = countryCode.toLowerCase();
+    }
     let intlTelInput = this.$().intlTelInput({
       allowExtensions: this.get('allowExtensions'),
       autoFormat: this.get('autoFormat'),
       autoHideDialCode: this.get('autoHideDialCode'),
       autoPlaceholder: this.get('autoPlaceholder'),
-      initialCountry: this.get('initialCountry'),
+      initialCountry: countryCode || this.get('initialCountry'),
       geoIpLookup: this.get('geoIpLookup'),
       nationalMode: this.get('nationalMode'),
       numberType: this.get('numberType'),
